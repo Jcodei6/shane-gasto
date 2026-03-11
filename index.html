@@ -5,114 +5,163 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Shane Gasto</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        darkCard: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             -webkit-tap-highlight-color: transparent; 
+            transition: background-color 0.3s ease;
         }
+
         .glass { 
             background: rgba(255, 255, 255, 0.85); 
             backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px); 
         }
-        /* Custom scrollbar for better PC experience */
-        ::-webkit-scrollbar {
-            width: 8px;
+
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.85);
+            border-color: rgba(51, 65, 85, 0.5);
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
+        .animate-slide-up {
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
+            background: #cbd5e1;
             border-radius: 10px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #cbd5e1;
-        }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-10">
+<body class="bg-slate-100 dark:bg-darkBg min-h-screen pb-10 text-slate-900 dark:text-slate-100">
 
-    <header class="glass sticky top-0 z-30 border-b border-slate-100 px-5 py-4 flex justify-between items-center shadow-sm">
+    <header class="glass sticky top-0 z-40 border-b border-slate-200 dark:border-slate-800 px-5 py-4 shadow-sm">
         <div class="max-w-6xl mx-auto w-full flex justify-between items-center">
-            <h1 class="text-lg md:text-xl font-extrabold tracking-tight text-indigo-600">SHANE GASTO</h1>
-            <button onclick="openModal()" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl text-[11px] md:text-xs font-black shadow-lg shadow-indigo-100 active:scale-95 transition-all uppercase tracking-widest hover:bg-indigo-700">
-                + Add Fee
-            </button>
+            <div class="flex items-center gap-3">
+                <h1 class="text-lg md:text-xl font-extrabold tracking-tight text-indigo-600 dark:text-indigo-400">SHANE GASTO</h1>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 transition-colors">
+                    <span class="dark:hidden">🌙</span>
+                    <span class="hidden dark:inline">☀️</span>
+                </button>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="shareApp()" id="share-btn" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm active:scale-90 transition-all">
+                    <span>🔗</span>
+                </button>
+                <button id="add-btn" onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-2xl text-[11px] md:text-xs font-black shadow-lg shadow-indigo-200 dark:shadow-none active:scale-95 transition-all uppercase tracking-widest">
+                    + Add Fee
+                </button>
+            </div>
         </div>
     </header>
 
+    <div id="view-only-banner" class="hidden bg-amber-500 text-white text-[10px] font-black uppercase tracking-[0.2em] py-2 text-center sticky top-[73px] z-30">
+        👀 View Only Mode
+    </div>
+
     <main class="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
-        <!-- Dashboard Stats - wider on PC -->
+        <!-- Dashboard Stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white rounded-[2rem] p-6 text-center border border-slate-100 shadow-sm transition-transform hover:scale-[1.02]">
+            <div class="bg-white dark:bg-darkCard rounded-[2rem] p-6 text-center border border-white dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-transform hover:scale-[1.02]">
                 <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Total Expenses</p>
-                <p id="total-val" class="text-2xl font-black text-slate-800">₱0</p>
+                <p id="total-val" class="text-2xl font-black">₱0</p>
             </div>
-            <div class="bg-emerald-50 rounded-[2rem] p-6 text-center border border-emerald-100 shadow-sm transition-transform hover:scale-[1.02]">
+            <div class="bg-emerald-50 dark:bg-emerald-950/30 rounded-[2rem] p-6 text-center border border-emerald-100 dark:border-emerald-900/50 shadow-sm transition-transform hover:scale-[1.02]">
                 <p class="text-[10px] font-extrabold text-emerald-500 uppercase tracking-widest mb-1">Total Paid</p>
-                <p id="paid-val" class="text-2xl font-black text-emerald-700">₱0</p>
+                <p id="paid-val" class="text-2xl font-black text-emerald-700 dark:text-emerald-400">₱0</p>
             </div>
-            <div class="bg-rose-50 rounded-[2rem] p-6 text-center border border-rose-100 shadow-sm transition-transform hover:scale-[1.02]">
-                <p class="text-[10px] font-extrabold text-rose-500 uppercase tracking-widest mb-1">Remaining Balance</p>
-                <p id="left-val" class="text-2xl font-black text-rose-700">₱0</p>
+            <div class="bg-rose-50 dark:bg-rose-950/30 rounded-[2rem] p-6 text-center border border-rose-100 dark:border-rose-900/50 shadow-sm transition-transform hover:scale-[1.02]">
+                <p class="text-[10px] font-extrabold text-rose-500 uppercase tracking-widest mb-1">Remaining</p>
+                <p id="left-val" class="text-2xl font-black text-rose-700 dark:text-rose-400">₱0</p>
             </div>
         </div>
 
-        <!-- Lists Container - Side by side on PC -->
+        <!-- Lists Container -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Pending Section -->
             <div>
                 <div class="flex items-center justify-between mb-4 px-2">
-                    <h2 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">⏳ Pending Payments</h2>
-                    <span id="pending-count" class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                    <h2 class="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">⏳ Pending Payments</h2>
+                    <span id="pending-count" class="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                 </div>
-                <div id="pending-list" class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-50 min-h-[100px]">
-                    <!-- Items will be injected here -->
-                </div>
+                <div id="pending-list" class="bg-white dark:bg-darkCard rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden divide-y divide-slate-50 dark:divide-slate-800 min-h-[100px]"></div>
             </div>
 
-            <!-- Paid Section -->
             <div>
                 <div class="flex items-center justify-between mb-4 px-2">
-                    <h2 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">✅ Completed</h2>
-                    <span id="paid-count" class="bg-emerald-100 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                    <h2 class="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">✅ Completed</h2>
+                    <span id="paid-count" class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                 </div>
-                <div id="paid-list" class="bg-slate-100/50 rounded-[2.5rem] border border-slate-100 overflow-hidden divide-y divide-slate-100 opacity-80 min-h-[100px]">
-                    <!-- Items will be injected here -->
-                </div>
+                <div id="paid-list" class="bg-white/50 dark:bg-darkCard/50 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden divide-y divide-slate-100 dark:divide-slate-800 opacity-80 min-h-[100px]"></div>
             </div>
         </div>
     </main>
 
-    <!-- Modal - Centered for PC, Bottom-sheet for Mobile -->
+    <!-- Context Menu Modal (iOS Style) -->
+    <div id="menu-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end justify-center p-4">
+        <div class="w-full max-w-sm animate-slide-up">
+            <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-[2rem] overflow-hidden mb-3">
+                <div id="menu-title" class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Options</p>
+                    <p id="selected-item-name" class="text-sm font-bold truncate"></p>
+                </div>
+                <button onclick="handleMenuEdit()" class="w-full py-4 px-6 text-left text-indigo-600 dark:text-indigo-400 font-semibold active:bg-slate-200 dark:active:bg-slate-700 transition-colors flex justify-between">
+                    Edit Item <span>✏️</span>
+                </button>
+                <button onclick="handleMenuToggle()" class="w-full py-4 px-6 text-left text-slate-700 dark:text-slate-200 font-semibold border-t border-slate-200 dark:border-slate-700 active:bg-slate-200 dark:active:bg-slate-700 transition-colors flex justify-between">
+                    Toggle Status <span>🔄</span>
+                </button>
+                <button onclick="handleMenuDelete()" class="w-full py-4 px-6 text-left text-rose-500 font-semibold border-t border-slate-200 dark:border-slate-700 active:bg-slate-200 dark:active:bg-slate-700 transition-colors flex justify-between">
+                    Delete Item <span>🗑️</span>
+                </button>
+            </div>
+            <button onclick="closeMenu()" class="w-full bg-white dark:bg-slate-800 py-4 rounded-[1.5rem] font-bold text-slate-900 dark:text-slate-100 shadow-lg">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Edit/Add Modal -->
     <div id="modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-end md:items-center justify-center">
-        <div class="bg-white w-full max-w-sm rounded-t-[3rem] md:rounded-[3rem] p-8 shadow-2xl animate-in slide-in-from-bottom md:zoom-in duration-300">
-            <h3 class="text-xl font-extrabold mb-6 text-slate-800">New Fee</h3>
+        <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-t-[3rem] md:rounded-[3rem] p-8 shadow-2xl animate-in slide-in-from-bottom md:zoom-in duration-300">
+            <h3 id="modal-title" class="text-xl font-extrabold mb-6">New Fee</h3>
             <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Description</label>
-                    <input id="in-name" type="text" placeholder="e.g. Graduation Fee" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Amount (₱)</label>
-                    <input id="in-amount" type="number" placeholder="0.00" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Deadline</label>
-                    <input id="in-deadline" type="text" placeholder="Optional" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all">
-                </div>
+                <input id="in-name" type="text" placeholder="Description" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+                <input id="in-amount" type="number" placeholder="Amount (₱)" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
+                <input id="in-deadline" type="text" placeholder="Deadline" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white">
                 <div class="flex gap-4 pt-4">
-                    <button onclick="closeModal()" class="flex-1 text-slate-400 font-bold text-sm hover:text-slate-600 transition-colors">Cancel</button>
-                    <button onclick="addNewItem()" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100">SAVE</button>
+                    <button onclick="closeModal()" class="flex-1 text-slate-400 font-bold text-sm">Cancel</button>
+                    <button onclick="saveItem()" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm shadow-lg shadow-indigo-100 dark:shadow-none">CONFIRM</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-bold px-6 py-3 rounded-full shadow-2xl opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+        Link copied to clipboard!
+    </div>
+
     <script>
-        // Pre-loaded data exactly from your image
         let expenses = [
             { id: 1, name: 'Seminar in Midsayap (JPAFTE)', amount: 950, paid: true, deadline: 'Feb 13, 2026' },
             { id: 2, name: 'CTE DAY', amount: 850, paid: true, deadline: 'Feb 6, 2026' },
@@ -122,17 +171,46 @@
             { id: 6, name: 'Culmination Program', amount: 1500, paid: false, deadline: '' },
             { id: 7, name: 'Internship Pictorials Fee', amount: 1250, paid: false, deadline: '1st week sa March' },
             { id: 8, name: 'Graduating ring', amount: 1800, paid: false, deadline: 'After sa Internship' },
-            { id: 9, name: 'Thesis: Hard bound', amount: 1000, paid: false, deadline: '' },
-            { id: 10, name: 'Thesis: Panukduki', amount: 1500, paid: false, deadline: '' },
-            { id: 11, name: 'Thesis: Editor', amount: 1000, paid: false, deadline: '' },
-            { id: 12, name: 'Thesis: Publication', amount: 2500, paid: false, deadline: '' },
             { id: 13, name: 'CAP EXAM', amount: 2600, paid: true, deadline: '' },
             { id: 14, name: 'TUITION', amount: 3238, paid: false, deadline: '' },
             { id: 15, name: 'Boarding House (Feb)', amount: 1650, paid: true, deadline: '' },
             { id: 16, name: 'Boarding House (March)', amount: 1650, paid: false, deadline: '' },
-            { id: 17, name: 'Credentials', amount: 2200, paid: false, deadline: 'Before March 30' },
-            { id: 18, name: 'Retreat', amount: 0, paid: false, deadline: 'TBA' }
+            { id: 17, name: 'Credentials', amount: 2200, paid: false, deadline: 'Before March 30' }
         ];
+
+        let editingId = null;
+        let menuId = null;
+        let isViewOnly = false;
+
+        function checkViewMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('mode') === 'view') {
+                isViewOnly = true;
+                document.getElementById('add-btn').classList.add('hidden');
+                document.getElementById('view-only-banner').classList.remove('hidden');
+            }
+        }
+
+        function shareApp() {
+            const shareUrl = window.location.origin + window.location.pathname + "?mode=view";
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = shareUrl;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 2000);
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
 
         function render() {
             const pendingList = document.getElementById('pending-list');
@@ -143,31 +221,30 @@
             let total = 0, paidTotal = 0, leftTotal = 0;
             let pCount = 0, dCount = 0;
 
-            expenses.forEach(exp => {
+            expenses.sort((a,b) => b.id - a.id).forEach(exp => {
                 total += exp.amount;
-                if(exp.paid) {
-                    paidTotal += exp.amount;
-                    dCount++;
-                } else {
-                    leftTotal += exp.amount;
-                    pCount++;
-                }
+                if(exp.paid) { paidTotal += exp.amount; dCount++; }
+                else { leftTotal += exp.amount; pCount++; }
 
                 const itemHtml = `
-                    <div class="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors group">
-                        <div onclick="togglePaid(${exp.id})" class="cursor-pointer transform transition-transform active:scale-90">
+                    <div class="p-4 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                        <div onclick="${isViewOnly ? '' : `togglePaid(${exp.id})`}" class="cursor-pointer transform transition-transform ${isViewOnly ? '' : 'active:scale-90'}">
                             ${exp.paid 
-                                ? '<svg class="text-emerald-500" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
-                                : '<svg class="text-slate-200 group-hover:text-indigo-200" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>'
+                                ? '<svg class="text-emerald-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
+                                : '<svg class="text-slate-200 dark:text-slate-700" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>'
                             }
                         </div>
-                        <div class="flex-1 min-w-0" onclick="togglePaid(${exp.id})">
-                            <p class="text-[14px] font-bold ${exp.paid ? 'text-slate-400 line-through' : 'text-slate-800'} truncate">${exp.name}</p>
-                            ${exp.deadline ? `<p class="text-[10px] font-bold text-slate-400 mt-0.5 flex items-center gap-1"><span>📅</span> ${exp.deadline}</p>` : ''}
+                        <div class="flex-1 min-w-0" onclick="${isViewOnly ? '' : `togglePaid(${exp.id})`}">
+                            <p class="text-[14px] font-bold ${exp.paid ? 'text-slate-400 dark:text-slate-500 line-through' : ''} truncate">${exp.name}</p>
+                            ${exp.deadline ? `<p class="text-[10px] font-bold text-slate-400 mt-0.5">📅 ${exp.deadline}</p>` : ''}
                         </div>
-                        <div class="text-right">
-                            <p class="text-[14px] font-black ${exp.paid ? 'text-slate-400' : 'text-slate-900'}">₱${exp.amount.toLocaleString()}</p>
-                            ${!exp.paid ? `<button onclick="deleteItem(${exp.id})" class="text-[10px] font-bold text-rose-300 hover:text-rose-500 transition-colors uppercase mt-1">Remove</button>` : ''}
+                        <div class="flex items-center gap-3">
+                            <p class="text-[14px] font-black ${exp.paid ? 'text-slate-400' : 'text-slate-900 dark:text-white'}">₱${exp.amount.toLocaleString()}</p>
+                            ${isViewOnly ? '' : `
+                            <button onclick="openMenu(${exp.id})" class="p-2 text-slate-300 hover:text-indigo-500 transition-colors">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                            </button>
+                            `}
                         </div>
                     </div>
                 `;
@@ -178,45 +255,83 @@
             document.getElementById('total-val').innerText = `₱${total.toLocaleString()}`;
             document.getElementById('paid-val').innerText = `₱${paidTotal.toLocaleString()}`;
             document.getElementById('left-val').innerText = `₱${leftTotal.toLocaleString()}`;
-            
             document.getElementById('pending-count').innerText = pCount;
             document.getElementById('paid-count').innerText = dCount;
         }
 
+        window.openMenu = (id) => {
+            if(isViewOnly) return;
+            menuId = id;
+            const item = expenses.find(e => e.id === id);
+            document.getElementById('selected-item-name').innerText = item.name;
+            document.getElementById('menu-modal').classList.remove('hidden');
+        };
+
+        window.closeMenu = () => document.getElementById('menu-modal').classList.add('hidden');
+
+        window.handleMenuEdit = () => {
+            const item = expenses.find(e => e.id === menuId);
+            editingId = menuId;
+            document.getElementById('modal-title').innerText = "Edit Fee";
+            document.getElementById('in-name').value = item.name;
+            document.getElementById('in-amount').value = item.amount;
+            document.getElementById('in-deadline').value = item.deadline;
+            closeMenu();
+            openModal();
+        };
+
+        window.handleMenuToggle = () => { togglePaid(menuId); closeMenu(); };
+
+        window.handleMenuDelete = () => {
+            if(confirm('Delete this permanently?')) {
+                expenses = expenses.filter(e => e.id !== menuId);
+                render();
+            }
+            closeMenu();
+        };
+
         window.togglePaid = (id) => {
+            if(isViewOnly) return;
             expenses = expenses.map(e => e.id === id ? {...e, paid: !e.paid} : e);
             render();
         };
 
-        window.deleteItem = (id) => {
-            if(confirm('Delete this item?')) {
-                expenses = expenses.filter(e => e.id !== id);
-                render();
-            }
-        };
-
-        window.addNewItem = () => {
+        window.saveItem = () => {
             const name = document.getElementById('in-name').value;
             const amount = Number(document.getElementById('in-amount').value);
             const deadline = document.getElementById('in-deadline').value;
             if(!name || !amount) return;
-            expenses.push({ id: Date.now(), name, amount, deadline, paid: false });
+
+            if(editingId) {
+                expenses = expenses.map(e => e.id === editingId ? {...e, name, amount, deadline} : e);
+            } else {
+                expenses.push({ id: Date.now(), name, amount, deadline, paid: false });
+            }
+            
             render();
             closeModal();
-            document.getElementById('in-name').value = '';
-            document.getElementById('in-amount').value = '';
-            document.getElementById('in-deadline').value = '';
         };
 
-        window.openModal = () => document.getElementById('modal').classList.remove('hidden');
-        window.closeModal = () => document.getElementById('modal').classList.add('hidden');
+        window.openModal = () => {
+            if(isViewOnly) return;
+            if(!editingId) {
+                document.getElementById('modal-title').innerText = "New Fee";
+                document.getElementById('in-name').value = '';
+                document.getElementById('in-amount').value = '';
+                document.getElementById('in-deadline').value = '';
+            }
+            document.getElementById('modal').classList.remove('hidden');
+        };
 
-        // Close modal on escape key
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
+        window.closeModal = () => {
+            editingId = null;
+            document.getElementById('modal').classList.add('hidden');
+        };
 
-        window.onload = render;
+        window.onload = () => {
+            checkViewMode();
+            render();
+        };
     </script>
 </body>
 </html>
