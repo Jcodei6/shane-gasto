@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shane Gasto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        .glass { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+        }
+        /* Custom scrollbar for better PC experience */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #cbd5e1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-10">
+
+    <header class="glass sticky top-0 z-30 border-b border-slate-100 px-5 py-4 flex justify-between items-center shadow-sm">
+        <div class="max-w-6xl mx-auto w-full flex justify-between items-center">
+            <h1 class="text-lg md:text-xl font-extrabold tracking-tight text-indigo-600">SHANE GASTO</h1>
+            <button onclick="openModal()" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl text-[11px] md:text-xs font-black shadow-lg shadow-indigo-100 active:scale-95 transition-all uppercase tracking-widest hover:bg-indigo-700">
+                + Add Fee
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
+        <!-- Dashboard Stats - wider on PC -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-[2rem] p-6 text-center border border-slate-100 shadow-sm transition-transform hover:scale-[1.02]">
+                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Total Expenses</p>
+                <p id="total-val" class="text-2xl font-black text-slate-800">₱0</p>
+            </div>
+            <div class="bg-emerald-50 rounded-[2rem] p-6 text-center border border-emerald-100 shadow-sm transition-transform hover:scale-[1.02]">
+                <p class="text-[10px] font-extrabold text-emerald-500 uppercase tracking-widest mb-1">Total Paid</p>
+                <p id="paid-val" class="text-2xl font-black text-emerald-700">₱0</p>
+            </div>
+            <div class="bg-rose-50 rounded-[2rem] p-6 text-center border border-rose-100 shadow-sm transition-transform hover:scale-[1.02]">
+                <p class="text-[10px] font-extrabold text-rose-500 uppercase tracking-widest mb-1">Remaining Balance</p>
+                <p id="left-val" class="text-2xl font-black text-rose-700">₱0</p>
+            </div>
+        </div>
+
+        <!-- Lists Container - Side by side on PC -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Pending Section -->
+            <div>
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <h2 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">⏳ Pending Payments</h2>
+                    <span id="pending-count" class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                </div>
+                <div id="pending-list" class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-50 min-h-[100px]">
+                    <!-- Items will be injected here -->
+                </div>
+            </div>
+
+            <!-- Paid Section -->
+            <div>
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <h2 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">✅ Completed</h2>
+                    <span id="paid-count" class="bg-emerald-100 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                </div>
+                <div id="paid-list" class="bg-slate-100/50 rounded-[2.5rem] border border-slate-100 overflow-hidden divide-y divide-slate-100 opacity-80 min-h-[100px]">
+                    <!-- Items will be injected here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal - Centered for PC, Bottom-sheet for Mobile -->
+    <div id="modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-end md:items-center justify-center">
+        <div class="bg-white w-full max-w-sm rounded-t-[3rem] md:rounded-[3rem] p-8 shadow-2xl animate-in slide-in-from-bottom md:zoom-in duration-300">
+            <h3 class="text-xl font-extrabold mb-6 text-slate-800">New Fee</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Description</label>
+                    <input id="in-name" type="text" placeholder="e.g. Graduation Fee" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Amount (₱)</label>
+                    <input id="in-amount" type="number" placeholder="0.00" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Deadline</label>
+                    <input id="in-deadline" type="text" placeholder="Optional" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all">
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button onclick="closeModal()" class="flex-1 text-slate-400 font-bold text-sm hover:text-slate-600 transition-colors">Cancel</button>
+                    <button onclick="addNewItem()" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pre-loaded data exactly from your image
+        let expenses = [
+            { id: 1, name: 'Seminar in Midsayap (JPAFTE)', amount: 950, paid: true, deadline: 'Feb 13, 2026' },
+            { id: 2, name: 'CTE DAY', amount: 850, paid: true, deadline: 'Feb 6, 2026' },
+            { id: 3, name: 'CTE day fer student', amount: 450, paid: true, deadline: 'Feb 16, 2026' },
+            { id: 4, name: 'Org shirt', amount: 450, paid: true, deadline: '' },
+            { id: 5, name: 'Intrams', amount: 1700, paid: false, deadline: 'March sa katapusan' },
+            { id: 6, name: 'Culmination Program', amount: 1500, paid: false, deadline: '' },
+            { id: 7, name: 'Internship Pictorials Fee', amount: 1250, paid: false, deadline: '1st week sa March' },
+            { id: 8, name: 'Graduating ring', amount: 1800, paid: false, deadline: 'After sa Internship' },
+            { id: 9, name: 'Thesis: Hard bound', amount: 1000, paid: false, deadline: '' },
+            { id: 10, name: 'Thesis: Panukduki', amount: 1500, paid: false, deadline: '' },
+            { id: 11, name: 'Thesis: Editor', amount: 1000, paid: false, deadline: '' },
+            { id: 12, name: 'Thesis: Publication', amount: 2500, paid: false, deadline: '' },
+            { id: 13, name: 'CAP EXAM', amount: 2600, paid: true, deadline: '' },
+            { id: 14, name: 'TUITION', amount: 3238, paid: false, deadline: '' },
+            { id: 15, name: 'Boarding House (Feb)', amount: 1650, paid: true, deadline: '' },
+            { id: 16, name: 'Boarding House (March)', amount: 1650, paid: false, deadline: '' },
+            { id: 17, name: 'Credentials', amount: 2200, paid: false, deadline: 'Before March 30' },
+            { id: 18, name: 'Retreat', amount: 0, paid: false, deadline: 'TBA' }
+        ];
+
+        function render() {
+            const pendingList = document.getElementById('pending-list');
+            const paidList = document.getElementById('paid-list');
+            pendingList.innerHTML = '';
+            paidList.innerHTML = '';
+            
+            let total = 0, paidTotal = 0, leftTotal = 0;
+            let pCount = 0, dCount = 0;
+
+            expenses.forEach(exp => {
+                total += exp.amount;
+                if(exp.paid) {
+                    paidTotal += exp.amount;
+                    dCount++;
+                } else {
+                    leftTotal += exp.amount;
+                    pCount++;
+                }
+
+                const itemHtml = `
+                    <div class="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors group">
+                        <div onclick="togglePaid(${exp.id})" class="cursor-pointer transform transition-transform active:scale-90">
+                            ${exp.paid 
+                                ? '<svg class="text-emerald-500" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
+                                : '<svg class="text-slate-200 group-hover:text-indigo-200" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>'
+                            }
+                        </div>
+                        <div class="flex-1 min-w-0" onclick="togglePaid(${exp.id})">
+                            <p class="text-[14px] font-bold ${exp.paid ? 'text-slate-400 line-through' : 'text-slate-800'} truncate">${exp.name}</p>
+                            ${exp.deadline ? `<p class="text-[10px] font-bold text-slate-400 mt-0.5 flex items-center gap-1"><span>📅</span> ${exp.deadline}</p>` : ''}
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[14px] font-black ${exp.paid ? 'text-slate-400' : 'text-slate-900'}">₱${exp.amount.toLocaleString()}</p>
+                            ${!exp.paid ? `<button onclick="deleteItem(${exp.id})" class="text-[10px] font-bold text-rose-300 hover:text-rose-500 transition-colors uppercase mt-1">Remove</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                if(exp.paid) paidList.innerHTML += itemHtml;
+                else pendingList.innerHTML += itemHtml;
+            });
+
+            document.getElementById('total-val').innerText = `₱${total.toLocaleString()}`;
+            document.getElementById('paid-val').innerText = `₱${paidTotal.toLocaleString()}`;
+            document.getElementById('left-val').innerText = `₱${leftTotal.toLocaleString()}`;
+            
+            document.getElementById('pending-count').innerText = pCount;
+            document.getElementById('paid-count').innerText = dCount;
+        }
+
+        window.togglePaid = (id) => {
+            expenses = expenses.map(e => e.id === id ? {...e, paid: !e.paid} : e);
+            render();
+        };
+
+        window.deleteItem = (id) => {
+            if(confirm('Delete this item?')) {
+                expenses = expenses.filter(e => e.id !== id);
+                render();
+            }
+        };
+
+        window.addNewItem = () => {
+            const name = document.getElementById('in-name').value;
+            const amount = Number(document.getElementById('in-amount').value);
+            const deadline = document.getElementById('in-deadline').value;
+            if(!name || !amount) return;
+            expenses.push({ id: Date.now(), name, amount, deadline, paid: false });
+            render();
+            closeModal();
+            document.getElementById('in-name').value = '';
+            document.getElementById('in-amount').value = '';
+            document.getElementById('in-deadline').value = '';
+        };
+
+        window.openModal = () => document.getElementById('modal').classList.remove('hidden');
+        window.closeModal = () => document.getElementById('modal').classList.add('hidden');
+
+        // Close modal on escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        window.onload = render;
+    </script>
+</body>
+</html>
